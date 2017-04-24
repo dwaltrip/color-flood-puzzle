@@ -1,7 +1,45 @@
 
+.app-container {
+  margin: 0 auto;
+}
+
 .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin: 10px;
+  padding-bottom: 5px;
   font-size: 20px;
   border-bottom: 1px solid #999;
 }
 
+.buttons {
+  display: flex;
+}
+
+.game-container {
+  margin: 10px;
+}
+
+.grid-container {
+  display: table;
+  border-collapse: collapse;
+}
+
+.grid-square {
+  border: 1px solid #ccc;
+  display: table-cell;
+  height: 20px;
+  width: 20px;
+}
+
+.grid-row {
+  display: table-row;
+}
+
+.red-square     { background-color: #ea7474; }
+.green-square   { background-color: #6cc367; }
+.blue-square    { background-color: #5e8de6; }
+.yellow-square  { background-color: #ecec6f; }
+.orange-square  { background-color: #f1bb57; }
+.purple-square  { background-color: #bf92bf; }
