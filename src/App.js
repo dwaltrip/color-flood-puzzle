@@ -3,18 +3,17 @@ import './App.css';
 
 class ColorPicker extends Component {
   render() {
+    var colorOptions = this.props.colors.map((color, i) => {
+      return <div
+        className={`color-option ${color}-bg`}
+        onClick={()=> this.props.onSelect(color)}
+        key={i}
+      />;
+    });
     return (
       <div className='color-picker'>
         <label>Choose next flood color:</label>
-        <div className='color-options'>
-          {this.props.colors.map((color, i) =>
-            <div
-              className={`color-option ${color}-bg`}
-              onClick={()=> this.props.onSelect(color)}
-              key={i}
-            />
-          )}
-        </div>
+        <div className='color-options'>{colorOptions}</div>
       </div>
     );
   }
@@ -37,6 +36,8 @@ class Grid extends Component {
 }
 
 const COLORS = ['green', 'blue', 'orange', 'red', 'yellow', 'purple'];
+const randomColor = ()=> COLORS[randomInt(0, COLORS.length)];
+
 const DEFAULT_SIZE = { width: 12, height: 12 };
 const GAME_ACTIVE = 'GAME_ACTIVE';
 const GAME_OVER   = 'GAME_OVER';
@@ -44,13 +45,12 @@ const GAME_OVER   = 'GAME_OVER';
 class Game extends Component {
   constructor() {
     super();
-    var { width, height } = DEFAULT_SIZE;
-    var grid = range(height, ()=> range(width, ()=> this.getRandomColor()));
-    this.state = { grid, moveCount: 0, status: GAME_ACTIVE };
+    this.state = this.stateForNewGame();
+
+    this.onNewGameClick = this.onNewGameClick.bind(this);
+    this.handleColorSelection = this.handleColorSelection.bind(this);
   }
-  getRandomColor() {
-    return COLORS[randomInt(0, COLORS.length)];
-  }
+
   handleColorSelection(colorToFlood) {
     var grid = this.state.grid;
     var points = findConnectedSquares(grid, 0, 0);
@@ -71,8 +71,14 @@ class Game extends Component {
       status:  isOneColor ? GAME_OVER : GAME_ACTIVE
     });
   }
+
+  onNewGameClick() {
+    if (this.isOver() || window.confirm('End this game and start a new one?')) {
+      this.setState(this.stateForNewGame());
+    }
+  }
+
   render() {
-    var isGameActive = this.state.status === GAME_ACTIVE;
     return (
       <div className='game-container'>
         <div className='header'>
@@ -81,14 +87,14 @@ class Game extends Component {
           <div className='move-counter'>Moves: {this.state.moveCount}</div>
 
           <div className='buttons'>
-            <button>New Game</button>
+            <button onClick={this.onNewGameClick}>New Game</button>
           </div>
         </div>
 
-        {isGameActive ?
+        {this.isActive() ?
           <ColorPicker
             colors={COLORS}
-            onSelect={color => this.handleColorSelection(color)}
+            onSelect={this.handleColorSelection}
           /> :
           <div className='game-over-message'>
             Congrats! You've filled the grid!
@@ -99,6 +105,15 @@ class Game extends Component {
       </div>
     );
   }
+
+  stateForNewGame() {
+    var { width, height } = DEFAULT_SIZE;
+    var grid = range(height, ()=> range(width, randomColor));
+    return { grid, moveCount: 0, status: GAME_ACTIVE };
+  }
+
+  isActive()  { return this.state.status === GAME_ACTIVE; }
+  isOver()    { return this.state.status === GAME_OVER;   }
 }
 
 class App extends Component {
