@@ -28,14 +28,28 @@ class ColorGrid extends Component {
       <div className='grid-container'>
         {this.props.grid.map((row, y) =>
           <div className='grid-row' key={y}>
-            {row.map((color, x) => (
-              <div className={`grid-square ${color}-bg`} key={x}/>
-            ))}
+            {row.map((color, x) => {
+              var borderInfo = this.props.getBorderInfo(x, y);
+              return <ColorSquare color={color} borderInfo={borderInfo} key={x} />
+            })}
           </div>
         )}
       </div>
     );
   }
+}
+
+function ColorSquare(props) {
+  var borderInfo = props.borderInfo || {};
+  var isActive = borderInfo.showRight || borderInfo.showBottom;
+  var className = [
+    'grid-square',
+    `${props.color}-bg`,
+    isActive ? 'is-active' : '',
+    borderInfo.showRight  ? 'active-right'  : '',
+    borderInfo.showBottom ? 'active-bottom' : ''
+  ].join(' ');
+  return <div className={className} />
 }
 
 const COLORS = ['green', 'blue', 'orange', 'red', 'yellow', 'purple'];
@@ -85,7 +99,28 @@ class Game extends Component {
     }
   }
 
+  getBorderInfoLookup() {
+    var grid = this.grid;
+    var squares = grid.findConnectedSquares(0, 0);
+    var getVal = (x, y) => grid.isPointValid({ x, y }) ? grid.getVal(x, y) : null;
+
+    return squares.reduce((memo, point) => {
+      var val = grid.getVal(point.x, point.y);
+      memo[grid.pointToStr(point)] = {
+        showBottom: getVal(point.x,     point.y + 1) === val,
+        showRight:  getVal(point.x + 1, point.y    ) === val,
+      }
+      return memo;
+    }, {});
+  }
+
   render() {
+    var borderInfoLookup = this.getBorderInfoLookup();
+    var getBorderInfo = (x, y) => {
+      var key = this.grid.pointToStr({ x, y });
+      return (key in borderInfoLookup) ? borderInfoLookup[key] : null;
+    };
+
     return (
       <div className='game-container'>
         <div className='header'>
@@ -103,7 +138,7 @@ class Game extends Component {
           <div className='game-over-message'>Congrats! You've filled the grid!</div>
         }
 
-        <ColorGrid grid={this.state.colorData}/>
+        <ColorGrid grid={this.state.colorData} getBorderInfo={getBorderInfo}/>
       </div>
     );
   }

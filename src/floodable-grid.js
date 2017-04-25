@@ -8,14 +8,15 @@ export default class FloodableGrid {
 
   getData() { return this.rows; }
 
+  getVal(x, y) { return this.rows[y][x]; }
+
   floodOverwrite(x, y, value) {
     this.findConnectedSquares(x, y).forEach(p => this.rows[p.y][p.x] = value);
-    this.rows[y][x] = value;
   }
 
   isUniform() {
     var isUniform = true;
-    var firstValue = this.rows[0][0];
+    var firstValue = this.getVal(0, 0);
     this.rows.forEach(row => {
       row.forEach(val => {
         if (val !== firstValue) { isUniform = false; }
@@ -28,16 +29,16 @@ export default class FloodableGrid {
     this.seenPoints = {};
     var squares = this._findConnectedSquares(startX, startY);
     this.seenPoints = null;
-    return squares;
+    return squares.concat({ x: startX, y: startY });
   }
 
   _findConnectedSquares(x, y) {
-    this.seenPoints[keyForPoint({ x, y })] = true;
-    var targetValue = this.rows[y][x];
+    this.seenPoints[this.pointToStr({ x, y })] = true;
+    var targetValue = this.getVal(x, y);
 
     return this.getNeighbors(x, y).reduce((matches, point)=> {
-      var currentValue = this.rows[point.y][point.x];
-      var key = keyForPoint(point);
+      var currentValue = this.getVal(point.x, point.y);
+      var key = this.pointToStr(point);
       var isNewMatch = currentValue === targetValue && !(key in this.seenPoints);
       if (isNewMatch) {
         this.seenPoints[key] = true;
@@ -60,8 +61,6 @@ export default class FloodableGrid {
       0 <= point.y && point.y < this.height
     );
   }
-};
 
-function keyForPoint({ x, y }) {
-  return `${x},${y}`;
-}
+  pointToStr({ x, y }) { return `${x},${y}`; }
+};
