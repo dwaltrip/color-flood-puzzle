@@ -38,8 +38,8 @@
 .grid-square {
   border: 1px solid #ccc;
   display: table-cell;
-  height: 20px;
-  width: 20px;
+  height: 25px;
+  width: 25px;
 }
 
 .grid-row {
@@ -59,7 +59,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px;
+  padding: 10px;
 }
 
 .color-picker > label {

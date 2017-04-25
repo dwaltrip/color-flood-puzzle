@@ -7,8 +7,16 @@
 
 [X] - Localstorage persistence
 
+[ ] - Move history (with left/right arrow key shortcuts for navigation)
+
+[X] - Create object for manipulating grid data
+
 [ ] - Border around edges of current connected grid area
 
-[ ] - Move history
+[ ] - User-configurable grid size
 
-[ ] - High score list
+[ ] - Add difficulty adjuster
+
+[ ] - High score list (organized by grid size, difficulty, num colors)
+      Use react-router to go between game & high scores
+      Add button to clear high scores
