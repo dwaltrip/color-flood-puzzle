@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import './App.css';
 
 class ColorPicker extends Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
     return (
       <div className='color-picker'>
@@ -24,9 +21,6 @@ class ColorPicker extends Component {
 }
 
 class Grid extends Component {
-  constructor() {
-    super();
-  }
   render() {
     return (
       <div className='grid-container'>
@@ -42,21 +36,20 @@ class Grid extends Component {
   }
 }
 
+const COLORS = ['green', 'blue', 'orange', 'red', 'yellow', 'purple'];
+const DEFAULT_SIZE = { width: 12, height: 12 };
+const GAME_ACTIVE = 'GAME_ACTIVE';
+const GAME_OVER   = 'GAME_OVER';
+
 class Game extends Component {
   constructor() {
     super();
-    this.defaultSize = { width: 20, height: 15 };
-    this.colors = ['green', 'blue', 'orange', 'red', 'yellow', 'purple'];
-    this.setupGrid();
+    var { width, height } = DEFAULT_SIZE;
+    var grid = range(height, ()=> range(width, ()=> this.getRandomColor()));
+    this.state = { grid, moveCount: 0, status: GAME_ACTIVE };
   }
   getRandomColor() {
-    var index = randomInt(0, this.colors.length);
-    return this.colors[index];
-  }
-  setupGrid() {
-    var { width, height } = this.defaultSize;
-    var grid = range(height, ()=> range(width, ()=> this.getRandomColor()));
-    this.state = { grid };
+    return COLORS[randomInt(0, COLORS.length)];
   }
   handleColorSelection(colorToFlood) {
     var grid = this.state.grid;
@@ -66,15 +59,42 @@ class Game extends Component {
       grid[y][x] = colorToFlood;
     });
     grid[0][0] = colorToFlood;
-    this.setState({ grid });
+
+    var isOneColor = Object.keys(grid.reduce((memo, row)=> {
+      row.forEach(color => memo[color] = true);
+      return memo;
+    }, {})).length === 1;
+
+    this.setState({
+      grid,
+      moveCount: this.state.moveCount + 1,
+      status:  isOneColor ? GAME_OVER : GAME_ACTIVE
+    });
   }
   render() {
+    var isGameActive = this.state.status === GAME_ACTIVE;
     return (
       <div className='game-container'>
-        <ColorPicker
-          colors={this.colors}
-          onSelect={color => this.handleColorSelection(color)}
-        />
+        <div className='header'>
+          <div className='header-text'>Color Flood</div>
+
+          <div className='move-counter'>Moves: {this.state.moveCount}</div>
+
+          <div className='buttons'>
+            <button>New Game</button>
+          </div>
+        </div>
+
+        {isGameActive ?
+          <ColorPicker
+            colors={COLORS}
+            onSelect={color => this.handleColorSelection(color)}
+          /> :
+          <div className='game-over-message'>
+            Congrats! You've filled the grid!
+          </div>
+        }
+
         <Grid grid={this.state.grid}/>
       </div>
     );
@@ -83,18 +103,7 @@ class Game extends Component {
 
 class App extends Component {
   render() {
-    return (
-      <div className='app-container'>
-        <div className='header'>
-          <div className='header-text'>Color Flood</div>
-          <div className='buttons'>
-            <button>New Game</button>
-          </div>
-        </div>
-
-        <Game />
-      </div>
-    );
+    return <Game />;
   }
 }
 

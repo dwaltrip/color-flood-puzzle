@@ -1,0 +1,14 @@
+
+[X] - End of game detection & message
+
+[X] - Move counter
+
+[ ] - New game button
+
+[ ] - Localstorage persistence
+
+[ ] - Border around edges of current connected grid area
+
+[ ] - Move history
+
+[ ] - High score list
