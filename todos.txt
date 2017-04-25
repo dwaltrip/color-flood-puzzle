@@ -5,7 +5,7 @@
 
 [X] - New game button
 
-[ ] - Localstorage persistence
+[X] - Localstorage persistence
 
 [ ] - Border around edges of current connected grid area
 

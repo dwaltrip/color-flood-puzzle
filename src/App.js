@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 
+import Store from './localstorage-store';
+
 class ColorPicker extends Component {
   render() {
     var colorOptions = this.props.colors.map((color, i) => {
@@ -45,10 +47,21 @@ const GAME_OVER   = 'GAME_OVER';
 class Game extends Component {
   constructor() {
     super();
-    this.state = this.stateForNewGame();
+    var savedState = Store.get('game-state', this.state)
+    this.updateState(savedState || this.stateForNewGame(), true);
 
     this.onNewGameClick = this.onNewGameClick.bind(this);
     this.handleColorSelection = this.handleColorSelection.bind(this);
+  }
+
+  updateState(newState, isForInit=false) {
+    var saveToStore = ()=> Store.set('game-state', this.state);
+    if (isForInit) {
+      this.state = newState;
+      saveToStore();
+    } else {
+      this.setState(newState, saveToStore);
+    }
   }
 
   handleColorSelection(colorToFlood) {
@@ -65,16 +78,17 @@ class Game extends Component {
       return memo;
     }, {})).length === 1;
 
-    this.setState({
+    this.updateState({
       grid,
       moveCount: this.state.moveCount + 1,
       status:  isOneColor ? GAME_OVER : GAME_ACTIVE
-    });
+    })
   }
 
   onNewGameClick() {
-    if (this.isOver() || window.confirm('End this game and start a new one?')) {
-      this.setState(this.stateForNewGame());
+    var noConfirmNeeded = this.isOver() || this.state.moveCount === 0;
+    if (noConfirmNeeded || window.confirm('End game and start a new one?')) {
+      this.updateState(this.stateForNewGame());
     }
   }
 
