@@ -4,6 +4,8 @@ import './App.css';
 import Store from './localstorage-store';
 import Grid from './floodable-grid';
 
+import GameHeader from './GameHeader';
+
 class ColorPicker extends Component {
   render() {
     var colorOptions = this.props.colors.map((color, i) => {
@@ -68,11 +70,12 @@ class Game extends Component {
 
     this.onNewGameClick = this.onNewGameClick.bind(this);
     this.handleColorSelection = this.handleColorSelection.bind(this);
+    this.requestGridSizeChange = this.requestGridSizeChange.bind(this);
   }
 
   initializeState() {
     var savedState = Store.get('game-state', this.state)
-    var initialState = savedState || this.stateForNewGame();
+    var initialState = savedState || this.stateForNewGame(DEFAULT_SIZE);
 
     this.grid = new Grid(initialState.colorData);
     this.state = initialState;
@@ -95,9 +98,21 @@ class Game extends Component {
   onNewGameClick() {
     var noConfirmNeeded = this.isOver() || this.state.moveCount === 0;
     if (noConfirmNeeded || window.confirm('End game and start a new one?')) {
-      var newState = this.stateForNewGame();
+      var newState = this.stateForNewGame(this.state.gridSize);
       this.grid = new Grid(newState.colorData);
       this.updateState(newState);
+    }
+  }
+
+  requestGridSizeChange(newSize, { onConfirm, onCancel }={}) {
+    var noConfirmNeeded = this.isOver() || this.state.moveCount === 0;
+    if (noConfirmNeeded || window.confirm('Change grid size and start a new game?')) {
+      var newState = this.stateForNewGame(newSize);
+      this.grid = new Grid(newState.colorData);
+      this.updateState(newState);
+      onConfirm && onConfirm();
+    } else {
+      onCancel && onCancel();
     }
   }
 
@@ -125,15 +140,12 @@ class Game extends Component {
 
     return (
       <div className='game-container'>
-        <div className='header'>
-          <div className='header-text'>Color Flood</div>
-
-          <div className='move-counter'>Moves: {this.state.moveCount}</div>
-
-          <div className='buttons'>
-            <button onClick={this.onNewGameClick}>New Game</button>
-          </div>
-        </div>
+        <GameHeader
+          gridSize={this.state.gridSize}
+          moveCount={this.state.moveCount}
+          requestGridSizeChange={this.requestGridSizeChange}
+          onNewGameClick={this.onNewGameClick}
+        />
 
         {this.isActive() ?
           <ColorPicker colors={COLORS} onSelect={this.handleColorSelection}/> :
@@ -145,12 +157,12 @@ class Game extends Component {
     );
   }
 
-  stateForNewGame() {
-    var { width, height } = DEFAULT_SIZE;
+  stateForNewGame({ width, height }=DEFAULT_SIZE) {
     return {
       colorData: range(height, ()=> range(width, randomColor)),
       moveCount: 0,
-      status: GAME_ACTIVE
+      status: GAME_ACTIVE,
+      gridSize: { width, height }
     };
   }
 

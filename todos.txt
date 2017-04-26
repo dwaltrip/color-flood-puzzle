@@ -13,7 +13,7 @@
 
 --------
 
-[ ] - User-configurable grid size
+[X] - User-configurable grid size
 
 [ ] - High score list (organized by grid size, difficulty, num colors)
       Use react-router to go between game & high scores
