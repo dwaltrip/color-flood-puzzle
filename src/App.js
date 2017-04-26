@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import './App.css';
 
 import Store from './localstorage-store';
@@ -15,10 +15,25 @@ class ColorPicker extends Component {
     });
     return (
       <div className='color-picker'>
-        <label>Choose next flood color:</label>
+        <label>Choose color:</label>
         <div className='color-options'>{colorOptions}</div>
       </div>
     );
+  }
+}
+
+class ColorSquare extends PureComponent {
+  render() {
+    var borderInfo = this.props.borderInfo || {};
+    var isActive = borderInfo.showRight || borderInfo.showBottom;
+    var className = [
+      'grid-square',
+      `${this.props.color}-bg`,
+      isActive ? 'is-active' : '',
+      borderInfo.showRight  ? 'active-right'  : '',
+      borderInfo.showBottom ? 'active-bottom' : ''
+    ].join(' ');
+    return <div className={className} />
   }
 }
 
@@ -37,19 +52,6 @@ class ColorGrid extends Component {
       </div>
     );
   }
-}
-
-function ColorSquare(props) {
-  var borderInfo = props.borderInfo || {};
-  var isActive = borderInfo.showRight || borderInfo.showBottom;
-  var className = [
-    'grid-square',
-    `${props.color}-bg`,
-    isActive ? 'is-active' : '',
-    borderInfo.showRight  ? 'active-right'  : '',
-    borderInfo.showBottom ? 'active-bottom' : ''
-  ].join(' ');
-  return <div className={className} />
 }
 
 const COLORS = ['green', 'blue', 'orange', 'red', 'yellow', 'purple'];
