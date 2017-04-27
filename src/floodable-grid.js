@@ -26,26 +26,24 @@ export default class FloodableGrid {
   }
 
   findConnectedSquares(startX, startY) {
-    this.seenPoints = {};
-    var squares = this._findConnectedSquares(startX, startY);
-    this.seenPoints = null;
-    return squares.concat({ x: startX, y: startY });
-  }
+    var targetVal = this.getVal(startX, startY);
+    var start = { x: startX, y: startY };
+    var seenPoints = { [this.pointToStr[start]]: start }
+    var stack = [start];
 
-  _findConnectedSquares(x, y) {
-    this.seenPoints[this.pointToStr({ x, y })] = true;
-    var targetValue = this.getVal(x, y);
+    while (stack.length > 0) {
+      var next = stack.pop();
+      this.getNeighbors(next.x, next.y).forEach(point => {
+        var val = this.getVal(point.x, point.y);
+        var key = this.pointToStr(point);
+        if (val === targetVal && !(key in seenPoints)) {
+          seenPoints[key] = point;
+          stack.push(point);
+        }
+      });
+    }
 
-    return this.getNeighbors(x, y).reduce((matches, point)=> {
-      var currentValue = this.getVal(point.x, point.y);
-      var key = this.pointToStr(point);
-      var isNewMatch = currentValue === targetValue && !(key in this.seenPoints);
-      if (isNewMatch) {
-        this.seenPoints[key] = true;
-        return matches.concat([point], this._findConnectedSquares(point.x, point.y));
-      }
-      return matches;
-    }, []);
+    return Object.keys(seenPoints).map(key => seenPoints[key]);
   }
 
   getNeighbors(x, y) {
