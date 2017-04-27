@@ -1,10 +1,10 @@
 import React, { Component, PureComponent } from 'react';
-import './App.css';
+import './game.css';
 
-import Store from './localstorage-store';
+import Store from './local-storage-store';
 import Grid from './floodable-grid';
 
-import GameHeader from './GameHeader';
+import GameHeader from './game-header';
 
 class ColorPicker extends Component {
   render() {
@@ -63,7 +63,7 @@ const DEFAULT_SIZE = { width: 12, height: 12 };
 const GAME_ACTIVE = 'GAME_ACTIVE';
 const GAME_OVER   = 'GAME_OVER';
 
-class Game extends Component {
+export default class Game extends Component {
   constructor() {
     super();
     this.initializeState();
@@ -169,14 +169,6 @@ class Game extends Component {
   isActive()  { return this.state.status === GAME_ACTIVE; }
   isOver()    { return this.state.status === GAME_OVER;   }
 }
-
-class App extends Component {
-  render() {
-    return <Game />;
-  }
-}
-
-export default App;
 
 function range(size, valueOrFn) {
   var fn = typeof valueOrFn === 'function' ? valueOrFn : (()=> valueOrFn);

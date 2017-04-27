@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
-const MIN_SIZE     = { width: 5,  height: 5 };
-const MAX_SIZE     = { width: 80, height: 60 };
+const MIN_SIZE = { width: 5,  height: 5 };
+const MAX_SIZE = { width: 80, height: 60 };
 
 export default class GameHeader extends Component {
   constructor(props) {

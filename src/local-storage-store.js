@@ -2,7 +2,6 @@
 const PREFIX = 'color-flood-puzzle__';
 
 export default {
-
   set: function(key, value) {
     localStorage.setItem(PREFIX + key, JSON.stringify(value));
   },
